@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nepali Fashion - AI Recommendation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Navigation -->
+      <nav class="bg-white shadow-md fixed w-full z-50">
+        <div
+          class="container mx-auto px-4 py-3 flex justify-between items-center"
+        >
+          <div class="flex items-center space-x-4">
+            <a href="#/" onclick="navigateTo('home')" class="text-2xl font-bold text-purple-600"
+              >NepaliFashion</a
+            >
+            <span class="text-sm text-gray-500">AI-Powered</span>
+          </div>
+          <div class="flex items-center space-x-6">
+            <a
+              href="#/"
+              onclick="navigateTo('home')"
+              class="text-gray-700 hover:text-purple-600"
+              >Home</a
+            >
+            <a
+              href="#/products"
+              onclick="navigateTo('products')"
+              class="text-gray-700 hover:text-purple-600"
+              >Products</a
+            >
+            <div id="auth-section">
+              <a
+                href="#/login"
+                onclick="navigateTo('login')"
+                class="text-gray-700 hover:text-purple-600"
+                id="login-btn"
+                >Login</a
+              >
+              <a
+                href="#/register"
+                onclick="navigateTo('register')"
+                class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+                id="register-btn"
+                >Register</a
+              >
+            </div>
+            <div id="user-section" style="display: none">
+              <span class="text-gray-700" id="username-display"></span>
+              <a
+                href="#/profile"
+                onclick="navigateTo('profile')"
+                class="text-gray-700 hover:text-purple-600 ml-4"
+                >Profile</a
+              >
+              <a
+                href="#/"
+                onclick="logout()"
+                class="text-red-600 hover:text-red-800 ml-4"
+                >Logout</a
+              >
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="pt-20 min-h-screen bg-gray-50">
+        <div id="content">
+          <!-- Dynamic content will be rendered here -->
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+          <p>&copy; 2026 NepaliFashion - AI Recommendation System for Nepal</p>
+          <p class="text-gray-400 text-sm mt-2">
+            Powered by Machine Learning &amp; Artificial Intelligence
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/interactions.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/recommendations.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
