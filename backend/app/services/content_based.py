@@ -40,7 +40,7 @@ class ContentBasedFilteringRecommender:
             print("[CONTENT_BASED] ⚠️ No products found to build feature vectors")
             return
         
-        print(f"[CONTENT_BASED] 🛠️ Building TF-IDF Feature Space for {len(products_df)} products...")
+        print(f"[CONTENT_BASED] Building TF-IDF Feature Space for {len(products_df)} products...")
         features = []
         
         for _, product in products_df.iterrows():
@@ -73,9 +73,9 @@ class ContentBasedFilteringRecommender:
             self.is_trained = True
             
             vocab_size = len(self.tfidf_vectorizer.vocabulary_)
-            print(f"[CONTENT_BASED] ✅ TF-IDF Model Trained! Vector matrix shape: {self.tfidf_matrix.shape} (Products x Terms), Vocabulary size: {vocab_size}")
+            print(f"[CONTENT_BASED] TF-IDF Model Trained! Vector matrix shape: {self.tfidf_matrix.shape} (Products x Terms), Vocabulary size: {vocab_size}")
         except Exception as e:
-            print(f"[CONTENT_BASED] ❌ Error building TF-IDF feature vectors: {e}")
+            print(f"[CONTENT_BASED] Error building TF-IDF feature vectors: {e}")
             self.is_trained = False
     
     def get_similar_products(self, product_id, n_similar=10):
@@ -106,7 +106,7 @@ class ContentBasedFilteringRecommender:
                 'similarity_score': float(similarities[i])
             })
         
-        print(f"[CONTENT_BASED] 🔍 Similar products computed for Item ID {product_id}: Top similarity = {results[0]['similarity_score']:.4f} if results else 0")
+        print(f"[CONTENT_BASED] Similar products computed for Item ID {product_id}: Top similarity = {results[0]['similarity_score']:.4f} if results else 0")
         return results
 
     def recommend_from_profile_text(self, profile_text, candidate_products, products_df, n_recommendations=20):
@@ -130,10 +130,10 @@ class ContentBasedFilteringRecommender:
                     })
             
             scores.sort(key=lambda x: x['content_score'], reverse=True)
-            print(f"[CONTENT_BASED] 📊 Profile text recommendation generated {len(scores)} candidate scores. Max similarity = {scores[0]['content_score']:.4f}" if scores else "[CONTENT_BASED] No candidate scores.")
+            print(f"[CONTENT_BASED] Profile text recommendation generated {len(scores)} candidate scores. Max similarity = {scores[0]['content_score']:.4f}" if scores else "[CONTENT_BASED] No candidate scores.")
             return scores[:n_recommendations]
         except Exception as e:
-            print(f"[CONTENT_BASED] ❌ Error scoring profile text: {e}")
+            print(f"[CONTENT_BASED] Error scoring profile text: {e}")
             return []
 
     def recommend_for_user(self, user_id, interactions_df, products_df, n_recommendations=20):
@@ -146,14 +146,14 @@ class ContentBasedFilteringRecommender:
         user_products = user_interactions['product_id'].tolist()
         
         if not user_products:
-            print(f"[CONTENT_BASED] ℹ️ User {user_id} has 0 interaction items in dataset")
+            print(f"[CONTENT_BASED] User {user_id} has 0 interaction items in dataset")
             return []
         
         all_product_ids = list(products_df['id'])
         candidate_products = [p for p in all_product_ids if p not in user_products]
         
         if not candidate_products:
-            print(f"[CONTENT_BASED] ℹ️ No un-interacted candidate products for User {user_id}")
+            print(f"[CONTENT_BASED]  No un-interacted candidate products for User {user_id}")
             return []
         
         # Build user profile vector by weighting interacted product vectors
@@ -180,7 +180,7 @@ class ContentBasedFilteringRecommender:
         
         user_vector = user_vector / count
         
-        print(f"[CONTENT_BASED] 🧠 User TF-IDF Vector computed from {len(user_products)} interacted items (Total weight: {count:.2f})")
+        print(f"[CONTENT_BASED] User TF-IDF Vector computed from {len(user_products)} interacted items (Total weight: {count:.2f})")
         
         scores = []
         for product_id in candidate_products:
@@ -197,5 +197,5 @@ class ContentBasedFilteringRecommender:
                 continue
         
         scores.sort(key=lambda x: x['content_score'], reverse=True)
-        print(f"[CONTENT_BASED] 🎯 Ranked {len(scores)} candidate products using TF-IDF Cosine Similarity for User {user_id}. Top score: {scores[0]['content_score']:.4f}" if scores else "[CONTENT_BASED] No candidate products ranked.")
+        print(f"[CONTENT_BASED] Ranked {len(scores)} candidate products using TF-IDF Cosine Similarity for User {user_id}. Top score: {scores[0]['content_score']:.4f}" if scores else "[CONTENT_BASED] No candidate products ranked.")
         return scores[:n_recommendations]

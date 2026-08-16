@@ -9,7 +9,7 @@ def seed_database(db: Session):
     
     # Check if products already exist
     if db.query(Product).count() > 0:
-        print("✅ Products already exist, skipping seed...")
+        print(" Products already exist, skipping seed...")
         return
     
     print("🌱 Seeding database with sample products...")
@@ -66,7 +66,7 @@ def seed_database(db: Session):
     for user in demo_users:
         db.add(user)
     db.commit()
-    print(f"✅ Created {len(demo_users)} demo users for testing")
+    print(f" Created {len(demo_users)} demo users for testing")
     
     # ============================================
     # Create products with real Unsplash images
@@ -367,7 +367,7 @@ def seed_database(db: Session):
     for product in products:
         db.add(product)
     db.commit()
-    print(f"✅ Created {len(products)} products")
+    print(f"Created {len(products)} products")
     
     # ============================================
     # Create demo interactions (for testing recommendations)
@@ -403,11 +403,11 @@ def seed_database(db: Session):
         interactions_created += 1
     
     db.commit()
-    print(f"✅ Created {interactions_created} demo interactions")
+    print(f"Created {interactions_created} demo interactions")
     print("=" * 50)
-    print("📝 NOTE: Demo users created for testing:")
+    print("NOTE: Demo users created for testing:")
     print("   Username: demo_ram, demo_sita, demo_hari")
     print("   Password: demo123")
     print("=" * 50)
-    print("✅ Database seeding complete!")
+    print("Database seeding complete!")
     print("💡 Real users can now register and get personalized recommendations!")

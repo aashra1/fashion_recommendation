@@ -61,7 +61,7 @@ def get_personalized_recommendations(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    print(f"\n[RECOMMENDATION_API] 📥 GET /api/recommendations/personalized for User: '{current_user.username}' (ID: {current_user.id})")
+    print(f"\n[RECOMMENDATION_API]: GET /api/recommendations/personalized for User: '{current_user.username}' (ID: {current_user.id})")
     
     # Check cache first
     cached = cache.get_recommendations(current_user.id)
@@ -71,7 +71,7 @@ def get_personalized_recommendations(
         if hydrated_cached:
             return hydrated_cached[:limit]
     
-    print(f"[CACHE] ❌ Cache MISS for User ID: {current_user.id}. Executing Recommendation Engine...")
+    print(f"[CACHE]  Cache MISS for User ID: {current_user.id}. Executing Recommendation Engine...")
     
     all_interactions = db.query(Interaction).all()
     print(f"[DATASET] 📈 Total Interactions in DB: {len(all_interactions)}")
@@ -87,7 +87,7 @@ def get_personalized_recommendations(
         interactions_df = pd.DataFrame(columns=['user_id', 'product_id', 'weight'])
     
     products_df = products_dataframe(db)
-    print(f"[DATASET] 📦 Total Products in DB: {len(products_df)}")
+    print(f"[DATASET] Total Products in DB: {len(products_df)}")
     
     # Get recommendations via Hybrid Engine
     recommendations = recommender.recommend_for_user(
@@ -109,7 +109,7 @@ def get_personalized_recommendations(
     print(f"[CACHE] 💾 Cached {len(recommendations)} recommendation items for User ID: {current_user.id}")
     
     hydrated = hydrate_recommendations(db, recommendations)
-    print(f"[RECOMMENDATION_API] ✅ Returning {len(hydrated)} personalized items for User: {current_user.username}\n")
+    print(f"[RECOMMENDATION_API] Returning {len(hydrated)} personalized items for User: {current_user.username}\n")
 
     return hydrated or recommendations_from_products(
         popular_products(db, limit),
@@ -122,10 +122,10 @@ def get_similar_products(
     limit: int = Query(10, ge=1, le=50),
     db: Session = Depends(get_db)
 ):
-    print(f"\n[RECOMMENDATION_API] 📥 GET /api/recommendations/similar/{product_id}")
+    print(f"\n[RECOMMENDATION_API]  GET /api/recommendations/similar/{product_id}")
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
-        print(f"[RECOMMENDATION_API] ❌ Product ID {product_id} not found!")
+        print(f"[RECOMMENDATION_API]  Product ID {product_id} not found!")
         raise HTTPException(status_code=404, detail="Product not found")
     
     print(f"[RECOMMENDATION_API] 🔎 Finding products similar to: '{product.name}' ({product.category} - {product.sub_category})")
@@ -143,5 +143,5 @@ def get_similar_products(
     products = db.query(Product).filter(Product.id.in_(similar_ids)).all()
     product_map = {product.id: product for product in products}
     results = [product_map[pid] for pid in similar_ids if pid in product_map]
-    print(f"[RECOMMENDATION_API] ✅ Found {len(results)} similar products for '{product.name}'\n")
+    print(f"[RECOMMENDATION_API] Found {len(results)} similar products for '{product.name}'\n")
     return results

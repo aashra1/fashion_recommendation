@@ -1,11 +1,11 @@
 // Auth Functions - COMPLETE FIXED VERSION
 
 async function register(userData) {
-  console.log("📝 Registering with data:", { ...userData, password: "***" });
+  console.log("Registering with data:", { ...userData, password: "***" });
 
   try {
     const response = await api.post("/auth/register", userData);
-    console.log("✅ Registration response:", response);
+    console.log("Registration response:", response);
 
     if (response.access_token) {
       localStorage.setItem("access_token", response.access_token);
@@ -16,21 +16,21 @@ async function register(userData) {
     }
     return response;
   } catch (error) {
-    console.error("❌ Registration error:", error);
+    console.error("Registration error:", error);
     showToast(error.message || "Registration failed", "error");
     throw error;
   }
 }
 
 async function login(username, password) {
-  console.log("🔐 Logging in with username:", username);
+  console.log("Logging in with username:", username);
 
   try {
     const response = await api.post("/auth/login", {
       username: username.trim(),
       password: password,
     });
-    console.log("✅ Login response received");
+    console.log("Login response received");
 
     if (response.access_token) {
       localStorage.setItem("access_token", response.access_token);
@@ -41,7 +41,7 @@ async function login(username, password) {
     }
     return response;
   } catch (error) {
-    console.error("❌ Login error:", error);
+    console.error("Login error:", error);
     showToast(error.message || "Login failed", "error");
     throw error;
   }

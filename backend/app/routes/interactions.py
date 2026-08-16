@@ -19,7 +19,7 @@ def log_interaction(
     # Check if product exists
     product = db.query(Product).filter(Product.id == interaction.product_id).first()
     if not product:
-        print(f"[INTERACTION] ❌ Failed to log interaction. Product ID {interaction.product_id} not found.")
+        print(f"[INTERACTION] Failed to log interaction. Product ID {interaction.product_id} not found.")
         raise HTTPException(status_code=404, detail="Product not found")
     
     # Calculate weight
@@ -46,7 +46,7 @@ def log_interaction(
     
     # Invalidate recommendation cache for user so next feed re-calculates
     cache.invalidate_user(current_user.id)
-    print(f"[INTERACTION] 🖱️ User '{current_user.username}' -> Event: {interaction.interaction_type} on '{product.name}' (Weight: {weight}) | User Cache Invalidated!")
+    print(f"[INTERACTION] User '{current_user.username}' -> Event: {interaction.interaction_type} on '{product.name}' (Weight: {weight}) | User Cache Invalidated!")
     
     return {"message": "Interaction logged successfully"}
 

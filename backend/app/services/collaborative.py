@@ -46,7 +46,7 @@ class CollaborativeFilteringRecommender:
         self.product_ids = set(interactions_df['product_id'].unique())
         self.is_trained = True
         
-        print(f"[COLLABORATIVE] ✅ SVD Model Trained Successfully! Trainset size: {trainset.n_ratings} ratings across {trainset.n_users} users and {trainset.n_items} products.")
+        print(f"[COLLABORATIVE] SVD Model Trained Successfully! Trainset size: {trainset.n_ratings} ratings across {trainset.n_users} users and {trainset.n_items} products.")
     
     def predict_rating(self, user_id, product_id):
         """Predict rating/interaction weight for a user-product pair using SVD decomposition"""

@@ -4,6 +4,9 @@ from .routes import auth, users, products, interactions, recommendations
 from .database import engine, Base
 from .seed_data import seed_database
 from .database import SessionLocal
+from fastapi.staticfiles import StaticFiles
+
+
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -17,6 +20,7 @@ except Exception as e:
     print(f"Database seeding skipped: {e}")
 
 app = FastAPI(title="Fashion Recommendation System API", version="1.0.0")
+app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
 # CORS middleware
 app.add_middleware(
