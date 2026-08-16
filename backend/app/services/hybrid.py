@@ -13,23 +13,23 @@ class HybridRecommender:
         self.is_trained = False
     
     def train(self, interactions_df, products_df):
-        """Train both collaborative and content-based models"""
+        """Train both collaborative (SVD) and content-based (TF-IDF) models"""
         try:
-            # Train collaborative filtering
+            print(f"[HYBRID_ENGINE] 🚀 Training Hybrid Recommender (Alpha Weight α={self.alpha:.2f})...")
             self.collaborative.train(interactions_df)
-            
-            # Build content-based feature vectors
             self.content_based.build_feature_vectors(products_df)
-            
             self.is_trained = True
-            print("✅ Hybrid recommender trained successfully")
+            print("[HYBRID_ENGINE] ✅ Hybrid Recommender successfully trained both SVD and TF-IDF models!")
         except Exception as e:
-            print(f"❌ Error training hybrid recommender: {e}")
+            print(f"[HYBRID_ENGINE] ❌ Error training hybrid recommender: {e}")
             self.is_trained = False
     
-    def recommend_for_user(self, user_id, interactions_df, products_df, n_recommendations=20):
-        """Get hybrid recommendations for a user"""
+    def recommend_for_user(self, user, interactions_df, products_df, n_recommendations=20):
+        """Get hybrid recommendations for a user (or user profile)"""
+        user_id = user.id if hasattr(user, 'id') else str(user)
+        
         if interactions_df.empty or products_df.empty:
+            print(f"[HYBRID_ENGINE] ⚠️ Dataset empty. Returning popular fallback products for User {user_id}")
             return self._get_fallback_recommendations(products_df, n_recommendations)
 
         self.train(interactions_df, products_df)
@@ -42,6 +42,38 @@ class HybridRecommender:
                 product_id for product_id in list(products_df["id"])
                 if product_id not in user_interacted_products
             ]
+
+            print(f"[HYBRID_ENGINE] 📊 Processing Hybrid Feed for User ID: {user_id}")
+            print(f"[HYBRID_ENGINE] ℹ️ Prior interactions logged: {len(user_interacted_products)} items | Candidate pool: {len(candidate_product_ids)} items")
+
+            # Check if user has zero interactions (Cold-Start)
+            if not user_interacted_products:
+                print(f"[HYBRID_ENGINE] ❄️ Cold-Start User detected! Attempting Profile-Based TF-IDF matching...")
+                categories = getattr(user, 'preferred_categories', []) or []
+                styles = getattr(user, 'preferred_styles', []) or []
+                
+                profile_terms = []
+                if isinstance(categories, list):
+                    profile_terms.extend(categories)
+                if isinstance(styles, list):
+                    profile_terms.extend(styles)
+                
+                profile_text = " ".join(profile_terms).strip()
+                if profile_text:
+                    print(f"[HYBRID_ENGINE] 🎯 Matching candidates against user explicit profile tags: '{profile_text}'")
+                    content_recs = self.content_based.recommend_from_profile_text(
+                        profile_text,
+                        candidate_product_ids,
+                        products_df,
+                        n_recommendations
+                    )
+                    if content_recs:
+                        profile_pairs = [(rec["product_id"], rec["content_score"]) for rec in content_recs]
+                        return self._format_recommendations(
+                            profile_pairs,
+                            products_df,
+                            f"Based on your profile preferences ({', '.join(profile_terms)})"
+                        )
 
             # Get collaborative recommendations
             collab_recs = self.collaborative.recommend_for_user(
@@ -60,7 +92,7 @@ class HybridRecommender:
             
             # If content-based failed, fall back to collaborative only
             if not content_recs:
-                print(f"ℹ️ Using collaborative-only recommendations for user {user_id}")
+                print(f"[HYBRID_ENGINE] ℹ️ Content-based model produced 0 results. Falling back to SVD Collaborative-only feed.")
                 collab_pairs = [
                     (rec["product_id"], rec.get("collaborative_score", 0))
                     for rec in collab_recs
@@ -68,21 +100,20 @@ class HybridRecommender:
                 return self._format_recommendations(
                     collab_pairs[:n_recommendations],
                     products_df,
-                    "Based on user behavior patterns"
+                    "Based on user behavior patterns (Collaborative SVD)"
                 )
             
             # Create score dictionaries
             collab_scores = {r['product_id']: r.get('collaborative_score', 0) for r in collab_recs}
             content_scores = {r['product_id']: r.get('content_score', 0) for r in content_recs}
             
-            # Get all product IDs
-            all_product_ids = set(collab_scores.keys()) | set(content_scores.keys())
+            all_candidate_ids = set(collab_scores.keys()) | set(content_scores.keys())
             
-            if not all_product_ids:
-                print(f"⚠️ No recommendations available for user {user_id}")
-                return []
+            if not all_candidate_ids:
+                print(f"[HYBRID_ENGINE] ⚠️ No candidate recommendations generated for User {user_id}")
+                return self._get_fallback_recommendations(products_df, n_recommendations)
             
-            # Normalize scores
+            # Normalize scores to [0, 1] range
             def normalize_scores(scores_dict):
                 if not scores_dict:
                     return {}
@@ -96,32 +127,34 @@ class HybridRecommender:
             norm_collab = normalize_scores(collab_scores)
             norm_content = normalize_scores(content_scores)
             
-            # Calculate hybrid scores
+            # Calculate hybrid weighted score: S_hybrid = α * S_collab + (1 - α) * S_content
             hybrid_scores = {}
-            for product_id in all_product_ids:
-                collab_score = norm_collab.get(product_id, 0)
-                content_score = norm_content.get(product_id, 0)
-                hybrid_scores[product_id] = (self.alpha * collab_score) + ((1 - self.alpha) * content_score)
+            for product_id in all_candidate_ids:
+                collab_score = norm_collab.get(product_id, 0.5)
+                content_score = norm_content.get(product_id, 0.5)
+                score = (self.alpha * collab_score) + ((1 - self.alpha) * content_score)
+                hybrid_scores[product_id] = score
             
-            # Sort by hybrid score
             sorted_scores = sorted(
                 hybrid_scores.items(),
                 key=lambda x: x[1],
                 reverse=True
             )
             
-            # Get top N recommendations
             top_products = sorted_scores[:n_recommendations]
+            
+            print(f"[HYBRID_ENGINE] 🏆 Composite Hybrid Recommendations generated!")
+            print(f"[HYBRID_ENGINE] 🧮 Score Formula: S_hybrid = {self.alpha:.2f} * S_collab + {(1-self.alpha):.2f} * S_content")
+            print(f"[HYBRID_ENGINE] 🥇 Top #1 Item ID: {top_products[0][0]} | Score: {top_products[0][1]:.4f}" if top_products else "")
             
             return self._format_recommendations(
                 top_products,
                 products_df,
-                "Based on your preferences and similar users"
+                "Tailored specifically for you using SVD Collaborative + TF-IDF Content Hybrid AI"
             )
             
         except Exception as e:
-            print(f"❌ Error in hybrid recommendations: {e}")
-            # Fall back to popular products
+            print(f"[HYBRID_ENGINE] ❌ Error in hybrid recommendation computation: {e}")
             return self._get_fallback_recommendations(products_df, n_recommendations)
     
     def _format_recommendations(self, recommendations, products_df, explanation):
@@ -136,24 +169,25 @@ class HybridRecommender:
                     'score': float(score) if not isinstance(score, (int, float)) else score,
                     'explanation': explanation
                 })
-            except:
+            except Exception as e:
                 continue
         return results
     
     def _get_fallback_recommendations(self, products_df, n_recommendations):
-        """Fallback to popular products when recommendation fails"""
+        """Fallback to popular products when recommendation fails or data is insufficient"""
         popular = products_df.head(n_recommendations)
         results = []
         for _, product in popular.iterrows():
             results.append({
                 'product': self._normalize_product_dict(product.to_dict()),
                 'score': 0.5,
-                'explanation': 'Popular products recommended'
+                'explanation': 'Popular fashion items'
             })
         return results
     
     def get_similar_products(self, product_id, products_df, n_similar=10):
         """Get similar products using content-based filtering"""
+        print(f"[HYBRID_ENGINE] 🔍 Querying Similar Products for Item ID: {product_id}")
         if not self.content_based.is_trained:
             self.content_based.build_feature_vectors(products_df)
         similar = self.content_based.get_similar_products(product_id, n_similar)
@@ -162,7 +196,7 @@ class HybridRecommender:
             try:
                 product = products_df[products_df['id'] == item['product_id']].iloc[0]
                 results.append(self._normalize_product_dict(product.to_dict()))
-            except:
+            except Exception as e:
                 continue
         return results
 

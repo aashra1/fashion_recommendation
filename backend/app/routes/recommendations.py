@@ -61,57 +61,59 @@ def get_personalized_recommendations(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    print(f"\n[RECOMMENDATION_API] 📥 GET /api/recommendations/personalized for User: '{current_user.username}' (ID: {current_user.id})")
+    
     # Check cache first
     cached = cache.get_recommendations(current_user.id)
     if cached:
+        print(f"[CACHE] ⚡ Cache HIT for User ID: {current_user.id}. Returning cached recommendation feed.")
         hydrated_cached = hydrate_recommendations(db, cached)
         if hydrated_cached:
             return hydrated_cached[:limit]
     
-    # Use the current user's interactions to decide whether personalization is possible.
-    user_interactions = db.query(Interaction).filter(
-        Interaction.user_id == current_user.id
-    ).all()
+    print(f"[CACHE] ❌ Cache MISS for User ID: {current_user.id}. Executing Recommendation Engine...")
     
-    if not user_interactions:
-        # New user - return popular products
-        return recommendations_from_products(
-            popular_products(db, limit),
-            "Popular products for new users"
-        )
-
     all_interactions = db.query(Interaction).all()
+    print(f"[DATASET] 📈 Total Interactions in DB: {len(all_interactions)}")
     
     # Prepare data for recommendation
-    interactions_df = pd.DataFrame([{
-        'user_id': i.user_id,
-        'product_id': i.product_id,
-        'weight': i.weight
-    } for i in all_interactions])
+    if all_interactions:
+        interactions_df = pd.DataFrame([{
+            'user_id': i.user_id,
+            'product_id': i.product_id,
+            'weight': i.weight
+        } for i in all_interactions])
+    else:
+        interactions_df = pd.DataFrame(columns=['user_id', 'product_id', 'weight'])
     
     products_df = products_dataframe(db)
+    print(f"[DATASET] 📦 Total Products in DB: {len(products_df)}")
     
-    # Get recommendations
+    # Get recommendations via Hybrid Engine
     recommendations = recommender.recommend_for_user(
-        current_user.id,
+        current_user,
         interactions_df,
         products_df,
         limit
     )
     
-    # Cache results
     if not recommendations:
+        print(f"[RECOMMENDATION_API] ℹ️ Returning fallback popular products for User: {current_user.username}")
         return recommendations_from_products(
             popular_products(db, limit),
-            "Popular products"
+            "Popular fashion items"
         )
 
+    # Cache results
     cache.set_recommendations(current_user.id, recommendations)
+    print(f"[CACHE] 💾 Cached {len(recommendations)} recommendation items for User ID: {current_user.id}")
+    
     hydrated = hydrate_recommendations(db, recommendations)
+    print(f"[RECOMMENDATION_API] ✅ Returning {len(hydrated)} personalized items for User: {current_user.username}\n")
 
     return hydrated or recommendations_from_products(
         popular_products(db, limit),
-        "Popular products"
+        "Popular fashion items"
     )
 
 @router.get("/similar/{product_id}", response_model=list[ProductResponse])
@@ -120,17 +122,19 @@ def get_similar_products(
     limit: int = Query(10, ge=1, le=50),
     db: Session = Depends(get_db)
 ):
+    print(f"\n[RECOMMENDATION_API] 📥 GET /api/recommendations/similar/{product_id}")
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
+        print(f"[RECOMMENDATION_API] ❌ Product ID {product_id} not found!")
         raise HTTPException(status_code=404, detail="Product not found")
     
-    # Get content-based recommendations
+    print(f"[RECOMMENDATION_API] 🔎 Finding products similar to: '{product.name}' ({product.category} - {product.sub_category})")
     products_df = products_dataframe(db)
     similar = recommender.get_similar_products(product_id, products_df, limit + 1)
     
-    # Remove the original product if present
     similar_ids = [p["id"] for p in similar if p.get("id") != product_id][:limit]
     if not similar_ids:
+        print(f"[RECOMMENDATION_API] ⚠️ No similar products found. Returning popular fallback.")
         return [
             p for p in popular_products(db, limit + 1)
             if p.id != product_id
@@ -138,4 +142,6 @@ def get_similar_products(
 
     products = db.query(Product).filter(Product.id.in_(similar_ids)).all()
     product_map = {product.id: product for product in products}
-    return [product_map[product_id] for product_id in similar_ids if product_id in product_map]
+    results = [product_map[pid] for pid in similar_ids if pid in product_map]
+    print(f"[RECOMMENDATION_API] ✅ Found {len(results)} similar products for '{product.name}'\n")
+    return results

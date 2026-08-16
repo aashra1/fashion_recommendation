@@ -87,7 +87,7 @@ def seed_database(db: Session):
             brand="Nepali Handicraft",
             material="Cotton",
             season=["All"],
-            image_url="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1617137968427-85924c800a22?w=600&auto=format&fit=crop",
             stock_quantity=20
         ),
         Product(
@@ -104,7 +104,7 @@ def seed_database(db: Session):
             brand="Festival Wear",
             material="Silk",
             season=["Dashain", "Tihar"],
-            image_url="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&auto=format&fit=crop",
             stock_quantity=15
         ),
         Product(
@@ -121,7 +121,7 @@ def seed_database(db: Session):
             brand="Urban Nepali",
             material="Denim",
             season=["Winter", "Monsoon"],
-            image_url="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600&auto=format&fit=crop",
             stock_quantity=10
         ),
         Product(
@@ -138,7 +138,7 @@ def seed_database(db: Session):
             brand="Handloom Nepal",
             material="Silk",
             season=["Dashain", "Tihar", "Wedding"],
-            image_url="https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&auto=format&fit=crop",
             stock_quantity=8
         ),
         Product(
@@ -155,7 +155,7 @@ def seed_database(db: Session):
             brand="Himalayan Gear",
             material="Polyester",
             season=["Summer", "Winter"],
-            image_url="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=600&auto=format&fit=crop",
             stock_quantity=5
         ),
         Product(
@@ -172,7 +172,7 @@ def seed_database(db: Session):
             brand="Little Nepal",
             material="Cotton",
             season=["Dashain", "Tihar"],
-            image_url="https://images.unsplash.com/photo-1519278409-1f56fdda7fe5?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?w=600&auto=format&fit=crop",
             stock_quantity=25
         ),
         Product(
@@ -189,7 +189,7 @@ def seed_database(db: Session):
             brand="Himalayan Pashmina",
             material="Pashmina",
             season=["Winter"],
-            image_url="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=600&auto=format&fit=crop",
             stock_quantity=12
         ),
         Product(
@@ -206,7 +206,7 @@ def seed_database(db: Session):
             brand="Nepali Tailors",
             material="Wool",
             season=["Winter"],
-            image_url="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop",
             stock_quantity=8
         ),
         Product(
@@ -223,7 +223,7 @@ def seed_database(db: Session):
             brand="Nepali Fitness",
             material="Spandex",
             season=["All"],
-            image_url="https://images.unsplash.com/photo-1518314916381-77a37c2a49ae?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&auto=format&fit=crop",
             stock_quantity=15
         ),
         Product(
@@ -240,7 +240,7 @@ def seed_database(db: Session):
             brand="Nepali Arts",
             material="Cotton",
             season=["All"],
-            image_url="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&auto=format&fit=crop",
             stock_quantity=30
         ),
         Product(
@@ -257,7 +257,7 @@ def seed_database(db: Session):
             brand="Nepali Leather",
             material="Leather",
             season=["Winter", "Monsoon"],
-            image_url="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1638247025967-b4e38f787b76?w=600&auto=format&fit=crop",
             stock_quantity=10
         ),
         Product(
@@ -274,7 +274,7 @@ def seed_database(db: Session):
             brand="Baby Nepal",
             material="Cotton",
             season=["All"],
-            image_url="https://images.unsplash.com/photo-1522771930-78848d9293e8?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1519689680058-324335c77eba?w=600&auto=format&fit=crop",
             stock_quantity=40
         ),
         Product(
@@ -291,7 +291,7 @@ def seed_database(db: Session):
             brand="Dhaka Handicraft",
             material="Cotton",
             season=["All"],
-            image_url="https://images.unsplash.com/photo-1558618666-fcd25c85f4a7?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=600&auto=format&fit=crop",
             stock_quantity=50
         ),
         Product(
@@ -308,7 +308,7 @@ def seed_database(db: Session):
             brand="Nepali Bridal",
             material="Silk",
             season=["Wedding", "Dashain"],
-            image_url="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=600&auto=format&fit=crop",
             stock_quantity=3
         ),
         Product(
@@ -325,7 +325,7 @@ def seed_database(db: Session):
             brand="Himalayan Gear",
             material="Polyester",
             season=["All"],
-            image_url="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=600&auto=format&fit=crop",
             stock_quantity=8
         ),
         Product(
@@ -342,7 +342,7 @@ def seed_database(db: Session):
             brand="Nepali Knits",
             material="Wool",
             season=["Winter"],
-            image_url="https://images.unsplash.com/photo-1531310197839-ccf54634509e?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=600&auto=format&fit=crop",
             stock_quantity=20
         ),
         Product(
@@ -359,7 +359,7 @@ def seed_database(db: Session):
             brand="School Nepal",
             material="Cotton",
             season=["All"],
-            image_url="https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=400&h=500&fit=crop",
+            image_url="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&auto=format&fit=crop",
             stock_quantity=35
         )
     ]

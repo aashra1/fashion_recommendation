@@ -4,6 +4,7 @@ from ..database import get_db
 from ..models import Interaction, User, Product
 from ..schemas import InteractionLog
 from ..security import get_current_user, get_weight_for_interaction
+from ..routes.recommendations import cache
 import uuid
 
 router = APIRouter(prefix="/api/interactions", tags=["interactions"])
@@ -18,13 +19,11 @@ def log_interaction(
     # Check if product exists
     product = db.query(Product).filter(Product.id == interaction.product_id).first()
     if not product:
+        print(f"[INTERACTION] ❌ Failed to log interaction. Product ID {interaction.product_id} not found.")
         raise HTTPException(status_code=404, detail="Product not found")
     
     # Calculate weight
     weight = get_weight_for_interaction(interaction.interaction_type, interaction.rating_value)
-    
-    # Get device info from request
-    user_agent = request.headers.get("user-agent", "")
     device_type = interaction.device_type or "Unknown"
     
     # Create interaction
@@ -45,6 +44,10 @@ def log_interaction(
     db.commit()
     db.refresh(new_interaction)
     
+    # Invalidate recommendation cache for user so next feed re-calculates
+    cache.invalidate_user(current_user.id)
+    print(f"[INTERACTION] 🖱️ User '{current_user.username}' -> Event: {interaction.interaction_type} on '{product.name}' (Weight: {weight}) | User Cache Invalidated!")
+    
     return {"message": "Interaction logged successfully"}
 
 @router.post("/batch-log")
@@ -54,7 +57,7 @@ def batch_log_interactions(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # Log multiple interactions at once
+    count = 0
     for interaction in interactions:
         product = db.query(Product).filter(Product.id == interaction.product_id).first()
         if not product:
@@ -75,6 +78,11 @@ def batch_log_interactions(
             time_spent=interaction.time_spent
         )
         db.add(new_interaction)
+        count += 1
     
     db.commit()
-    return {"message": f"{len(interactions)} interactions logged successfully"}
+    if count > 0:
+        cache.invalidate_user(current_user.id)
+        print(f"[INTERACTION] 📦 Batch logged {count} interactions for User '{current_user.username}' | Cache Invalidated!")
+    
+    return {"message": f"{count} interactions logged successfully"}
